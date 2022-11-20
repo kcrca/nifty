@@ -20,10 +20,10 @@ def bloom(surface: Surface, ul: tuple[float, float],
     base_range, mid1_range, mid2_range, end_range = w * 5 / 75, w * 50 / 75, w * 50 / 75, w * 275 / 75
     count = 120
     for i in range(count):
-        c = color_fuzz.fuzz(color)
+        c = color_fuzz(color)
         ctx.set_source_rgb(*c.rgb)
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-        ctx.set_line_width(1 * width_fuzz.fuzz(1))
+        ctx.set_line_width(1 * width_fuzz(1))
         ctx.move_to(*base)
         ctx.curve_to(*mid1, *mid2, *end)
         ctx.stroke()
@@ -59,7 +59,7 @@ def chaikin(surface: Surface, coords, color: Color, coord_fuzzer: Fuzzer[float] 
         R[2::2] = Q[1:-1:2]
         R[1:-1:2] = Q[2::2]
         R[-1] = Q[-1]
-        coords = np.array(tuple(q * coord_fuzzer(0.75) for q in Q)) + np.array(tuple(r * coord_fuzzer.fuzz(0.25) for r in R))
+        coords = np.array(tuple(q * coord_fuzzer(0.75) for q in Q)) + np.array(tuple(r * coord_fuzzer(0.25) for r in R))
         # print(i, coords)
         # print(i, Q * coord_fuzzer.fuzz(0.75) + R * coord_fuzzer.fuzz(0.25))
 

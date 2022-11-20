@@ -42,13 +42,13 @@ class Fuzzers:
 
         def fuzz(v: float) -> float:
             nv = min(max(v, half), high - half)
-            return fuzzer.fuzz(nv)
+            return fuzzer(nv)
 
         return Fuzzer(fuzz)
 
     @staticmethod
     def scaled(scale: float, fuzzer: Fuzzer) -> Fuzzer[float]:
-        return Fuzzer(lambda v: scale * fuzzer.fuzz(v))
+        return Fuzzer(lambda v: scale * fuzzer(v))
 
     @staticmethod
     def color(h_range: float, s_range: float, l_range: float) -> Fuzzer[Color]:
@@ -58,6 +58,6 @@ class Fuzzers:
 
         def fuzz(v: Color) -> Color:
             h, s, l = v.hsl
-            return Color(hsl=(h_fuzz.fuzz(h), s_fuzz.fuzz(s), l_fuzz.fuzz(l)))
+            return Color(hsl=(h_fuzz(h), s_fuzz(s), l_fuzz(l)))
 
         return Fuzzer(fuzz)
