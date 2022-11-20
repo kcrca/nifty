@@ -10,10 +10,10 @@ from shapes import chaikin
 def sketchy():
     with cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500) as surface:
         coords = ((100, 100), (375, 250), (150, 200), (220, 400))
-        color = Color(hsl=(0.67, 1, 0.4))
-        fuzzer = Fuzzers.uniform(0, 0.025)
+        color = Color(hsl=(0.33, 0.75, 0.25))
+        fuzzer = Fuzzers.uniform(0, 0.01)
         for _ in range(5):
-            chaikin(surface, coords, color, fuzzer, refinements=2)
+            chaikin(surface, coords, color, fuzzer, refinements=6)
         surface.write_to_png("out.png")
 
 

@@ -15,7 +15,7 @@ def bloom(surface: Surface, ul: tuple[float, float],
     mid2 = [ul[0] + w * 2, ul[1] + h * 2 / 30]
     end = [ul[0] + w, ul[1]]
     width_fuzz = Fuzzers.uniform(1, 0.5)
-    color_fuzz = Fuzzers.color(0.1, 0.2, 0.1)
+    color_fuzz = Fuzzers.hsl(0.1, 0.2, 0.1)
     ctx = cairo.Context(surface)
     base_range, mid1_range, mid2_range, end_range = w * 5 / 75, w * 50 / 75, w * 50 / 75, w * 275 / 75
     count = 120
@@ -59,9 +59,8 @@ def chaikin(surface: Surface, coords, color: Color, coord_fuzzer: Fuzzer[float] 
         R[2::2] = Q[1:-1:2]
         R[1:-1:2] = Q[2::2]
         R[-1] = Q[-1]
-        coords = np.array(tuple(q * coord_fuzzer(0.75) for q in Q)) + np.array(tuple(r * coord_fuzzer(0.25) for r in R))
-        # print(i, coords)
-        # print(i, Q * coord_fuzzer.fuzz(0.75) + R * coord_fuzzer.fuzz(0.25))
+        coords = np.array(tuple(q * (coord_fuzzer(0.75), coord_fuzzer(0.75)) for q in Q)) + np.array(
+            tuple(r * (coord_fuzzer(0.25), coord_fuzzer(0.25)) for r in R))
 
     draw_line(surface, coords, color)
 

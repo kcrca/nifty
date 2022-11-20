@@ -13,7 +13,8 @@ class Fuzzer(ABC, Generic[T]):
         self.fuzzer = fuzzer
 
     def __call__(self, v: T) -> T:
-        return self.fuzz(v)
+        nv = self.fuzz(v)
+        return nv
 
     def fuzz(self, v: T) -> T:
         return self.fuzzer(v)
@@ -51,7 +52,7 @@ class Fuzzers:
         return Fuzzer(lambda v: scale * fuzzer(v))
 
     @staticmethod
-    def color(h_range: float, s_range: float, l_range: float) -> Fuzzer[Color]:
+    def hsl(h_range: float, s_range: float, l_range: float) -> Fuzzer[Color]:
         h_fuzz = Fuzzers.ranged(0, 1, h_range)
         s_fuzz = Fuzzers.ranged(0, 1, s_range)
         l_fuzz = Fuzzers.ranged(0, 1, l_range)
