@@ -1,8 +1,10 @@
 import cairo
 from colour import Color
 
-from shapes import bloom, chaikins_corner_cutting
+from shapes import bloom
 
+
+# Shapely library is probably useful when composing things
 
 def bloomCairo():
     with cairo.ImageSurface(cairo.FORMAT_ARGB32, 500, 500) as surface:

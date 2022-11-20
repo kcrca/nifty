@@ -12,6 +12,9 @@ class Fuzzer(ABC, Generic[T]):
     def __init__(self, fuzzer: Fuzz):
         self.fuzzer = fuzzer
 
+    def __call__(self, v: T) -> T:
+        return self.fuzz(v)
+
     def fuzz(self, v: T) -> T:
         return self.fuzzer(v)
 
@@ -21,15 +24,19 @@ class Fuzzer(ABC, Generic[T]):
 
 class Fuzzers:
     @staticmethod
-    def uniform(mid: float, range: float) -> Fuzzer:
+    def no_fuzz() -> Fuzzer[T]:
+        return Fuzzer(lambda v: v)
+
+    @staticmethod
+    def uniform(mid: float, range: float) -> Fuzzer[float]:
         return Fuzzer(lambda v: v + random.uniform(mid - range, mid + range))
 
     @staticmethod
-    def gauss(mid: float, stddev: float) -> Fuzzer:
+    def gauss(mid: float, stddev: float) -> Fuzzer[float]:
         return Fuzzer(lambda v: v + random.gauss(mid, stddev))
 
     @staticmethod
-    def ranged(low: float, high: float, range: float) -> Fuzzer:
+    def ranged(low: float, high: float, range: float) -> Fuzzer[float]:
         half = range / 2
         fuzzer = Fuzzers.uniform(-half, +half)
 
@@ -40,7 +47,7 @@ class Fuzzers:
         return Fuzzer(fuzz)
 
     @staticmethod
-    def scaled(scale: float, fuzzer: Fuzzer) -> Fuzzer:
+    def scaled(scale: float, fuzzer: Fuzzer) -> Fuzzer[float]:
         return Fuzzer(lambda v: scale * fuzzer.fuzz(v))
 
     @staticmethod

@@ -1,9 +1,9 @@
 import cairo
 import numpy as np
 from cairo import Surface
-from colour import Color
 
-from nifty.fuzz import Fuzzers
+from colour import Color
+from nifty.fuzz import Fuzzer, Fuzzers
 
 
 def bloom(surface: Surface, ul: tuple[float, float],
@@ -33,16 +33,36 @@ def bloom(surface: Surface, ul: tuple[float, float],
         end[0] += end_range / count
 
 
-def chaikins_corner_cutting(coords, refinements=5):
-    coords = np.array(coords)
+def draw_line(surface, coords, color):
+    ctx = cairo.Context(surface)
+    ctx.set_source_rgba(*color.rgba)
+    ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+    ctx.set_line_width(1.5)
+    ctx.move_to(coords[0][0], coords[0][1])
+    for i in range(1, len(coords)):
+        ctx.line_to(coords[i][0], coords[i][1])
+    ctx.stroke()
 
-    for _ in range(refinements):
+
+def chaikin(surface: Surface, coords, color: Color, coord_fuzzer: Fuzzer[float] = None, refinements=5):
+    coords = np.array(coords)
+    if coord_fuzzer is None:
+        coord_fuzzer = Fuzzers.no_fuzz()
+
+    base_color = color.darker()
+    base_color.alpha = 0.1
+    draw_line(surface, coords, base_color)
+    for i in range(refinements):
         Q = coords.repeat(2, axis=0)
         R = np.empty_like(Q)
         R[0] = Q[0]
         R[2::2] = Q[1:-1:2]
         R[1:-1:2] = Q[2::2]
         R[-1] = Q[-1]
-        coords = Q * 0.75 + R * 0.25
+        coords = np.array(tuple(q * coord_fuzzer(0.75) for q in Q)) + np.array(tuple(r * coord_fuzzer.fuzz(0.25) for r in R))
+        # print(i, coords)
+        # print(i, Q * coord_fuzzer.fuzz(0.75) + R * coord_fuzzer.fuzz(0.25))
+
+    draw_line(surface, coords, color)
 
     return coords
